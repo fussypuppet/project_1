@@ -1,0 +1,43 @@
+.board {
+    display: grid;
+    width: 270px;
+    grid-template-columns: 135px 135px;
+    grid-template-rows: 220px 220px;
+    border: 5px double black;
+}
+
+.room {
+    display: grid;
+    grid-template-columns: 25px 25px 25px 25px 25px;
+    grid-template-rows: 35px 35px 35px 35px 35px 35px;
+    border: 5px double black;
+}
+
+.square {
+    border: 1px dotted black;
+    color: white;
+}
+
+#room1 > .square15 {
+    border-right: 4px solid brown;
+}
+#room1 > .square28 {
+    border-bottom: 4px solid brown;
+}
+#room2 > .square11 {
+    border-left: 4px solid brown;
+}
+#room2 > .square29 {
+    border-bottom: 4px solid brown;
+}
+#room3 > .square3 {
+    border-top: 4px solid brown;
+}
+#room4 > .square4 {
+    border-top: 4px solid brown;
+}
+
+.player_character {
+    width: 21px;
+    margin: 2px 0 0 1px;
+}
