@@ -13,5 +13,6 @@ const playerCharacter = {
     power: Number;
     hitPoints: Number;
     armor: Number;
-    Inventory: Array; //a list of all useful items the character has picked up
+    inventory: Array; //a list of all useful items the character has picked up
+    location: id //id of tile location
 }
