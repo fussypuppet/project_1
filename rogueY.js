@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', function(){
     }
 
     function Character(power, hitPoints, armor, name, image_location){
+        this.name = name;
         this.power = power;
         this.hitPoints = hitPoints;
         this.armor = armor;
@@ -48,24 +49,28 @@ document.addEventListener('DOMContentLoaded', function(){
         icon.setAttribute("src", image_location);
         this.image = icon;
         this.setLocation = function(location){ // make sure character is nowhere else, and place them in the indicated location
-            console.log("setting location to " + location);
+            //console.log("setting location to " + location);
             for (tile of GAME_TILES){
                 if ((tile.contains === this) && (tile._id != location)){  // remove the character from the old tile
-                    console.log("I should never fire actually yes I should");
+                    //console.log("I should never fire actually yes I should");
                     tile.contains = "";
                     tile.element.innerHTML = "";
                 }
                 if (tile._id === location){
-                    console.log("in middle of setLocation.  Tile:", tile, location, this);
+                    //console.log("in middle of setLocation.  Tile:", tile, location, this);
                     tile.contains = this;
                     tile.element.appendChild(this.image);
                     this.location = tile._id;
-                    console.log("at end of setLocation.  Tile:", tile, location, this); 
+                    //console.log("at end of setLocation.  Tile:", tile, location, this); 
                 }
             }
         }
         this.move = function(direction){
             if (GAME_TILES[this.location][direction]){
+                //console.log("game tiles this location direction", GAME_TILES[GAME_TILES[this.location][direction]]);
+                if (GAME_TILES[GAME_TILES[this.location][direction]].contains){ // if there is something to the tile to the north of the tile that the player is in
+                    direction = resolveEncounter(this, direction);
+                }
                 switch (direction) {
                     case ("up"):
                         this.setLocation(GAME_TILES[this.location].up);
@@ -77,13 +82,46 @@ document.addEventListener('DOMContentLoaded', function(){
                         this.setLocation(GAME_TILES[this.location].down);
                         break;
                     case ("left"):
-                        console.log("in left move function", this.location, direction);
+                        //console.log("in left move function", this.location, direction);
                         this.setLocation(GAME_TILES[this.location].left);
                 }
             } else {
-                console.log("Cannot move that direction");
+                //console.log("Cannot move that direction");
             }
-            console.log("Character moved.  Current position: " + this.location);
+            //console.log("Character moved.  Current position: " + this.location);
+        }
+    }
+    
+    function resolveEncounter(player, direction){  // resolve encounter and return unchanged direction if movement is ok, or null if movement should be canceled
+        let foundObject = GAME_TILES[GAME_TILES[player.location][direction]].contains;
+        let newMessage = document.createElement("li");
+        newMessage.innerText = "You have encountered a " + foundObject.name;
+        document.getElementById("log_player1").appendChild(newMessage);
+        switch (foundObject.name) {
+            case "key":
+                let gameOver = false;
+                for (thisObject of player.inventory){
+                        console.log("thisObject", thisObject);
+                        console.log("player inventory", player.inventory);
+                        if (thisObject.name === "key"){
+                            gameOver = true;
+                        }
+                }
+                console.log("adding foundObject to inventory", foundObject);
+                player.inventory.push(foundObject);
+                console.log("object better be in inventory now", player.inventory);
+                foundObject.setLocation(null);
+                let newInventoryItem = document.createElement("li");
+                newInventoryItem.innerText = "a key";
+                document.getElementById("inventory_player1").appendChild(newInventoryItem);
+                if (gameOver === true){
+                    let newMessage = document.createElement('li');
+                    newMessage.innerText = "Congratulations! You won!";
+                    document.getElementById("log_player1").appendChild(newMessage);
+                    let cheer = new Audio("./1_person_cheering-Jett_Rifkin-1851518140.mp3")
+                    cheer.play();
+                }
+                return direction;
         }
     }
 
@@ -144,8 +182,14 @@ document.addEventListener('DOMContentLoaded', function(){
     }    
 
     createBoard();
-    const playerCharacter = new Character(1, 15, 0, "player_character", "./maybesmiley.jpg");
+    const playerCharacter = new Character(1, 15, 0, "player_character", "./player.png");
+    const key1 = new Character(0, 1, 0 , "key", "./key.png");
+    const key2 = new Character(0, 1, 0 , "key", "./key.png");
     playerCharacter.setLocation(0);
+    key1.setLocation(Math.floor(Math.random()*GAME_TILES.length));
+    key2.setLocation(Math.floor(Math.random()*GAME_TILES.length));
+    console.log('key1', key1.location);
+    console.log('key2', key2.location);
     console.log("Tile List", GAME_TILES);
     console.log("Player character", playerCharacter);
 
