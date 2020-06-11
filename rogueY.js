@@ -3,6 +3,15 @@ document.addEventListener('DOMContentLoaded', function(){
     const roomWidth = 5;
     const roomCount = 6;
     const GAME_TILES = [];
+    const coworkerNames = [
+        {name: "Robin", image: "./thisR.png"}, 
+        {name: "Sal", image: "./thisS.png"}, 
+        {name: "Mel", image: "./thisM.png"}, 
+        {name: "Sam", image: "./thisS.png"}, 
+        {name: "Dana", image:"./thisD.png"}, 
+        {name: "Harley", image: "./thisH.png"}
+    ];
+    const pronouns = ["He", "She", "They"];
 
     document.onkeydown = function(e){
         console.log("keypress logged.  E:", e);
@@ -185,6 +194,12 @@ document.addEventListener('DOMContentLoaded', function(){
     const playerCharacter = new Character(1, 15, 0, "player_character", "./player.png");
     const key1 = new Character(0, 1, 0 , "key", "./key.png");
     const key2 = new Character(0, 1, 0 , "key", "./key.png");
+    for (let i=0; i<3; i++){
+        let newMonsterInfo = coworkerNames.splice(Math.floor(Math.random()*coworkerNames.length), 1)[0];
+        console.log("newMonsterInfo", newMonsterInfo);
+        let newMonster = new Character(1, 10, 0, newMonsterInfo.name, newMonsterInfo.image);
+        newMonster.setLocation(Math.floor(Math.random()*GAME_TILES.length));
+    }
     playerCharacter.setLocation(0);
     key1.setLocation(Math.floor(Math.random()*GAME_TILES.length));
     key2.setLocation(Math.floor(Math.random()*GAME_TILES.length));

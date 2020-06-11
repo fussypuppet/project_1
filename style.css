@@ -2,7 +2,7 @@
     display: grid;
     width: 410px;
     grid-template-columns: 100px 300px;
-    grid-template-rows: 150px 150px;
+    grid-template-rows: 120px 120px;
     grid-gap: 10px;
     margin: 0 0 20px 0;
 }
@@ -49,6 +49,10 @@
 .player_character {
     width: 21px;
     margin: 2px 0 0 1px;
+}
+
+img {
+    width: 21px;
 }
 
 .info > div {
