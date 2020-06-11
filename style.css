@@ -1,3 +1,12 @@
+.info {
+    display: grid;
+    width: 410px;
+    grid-template-columns: 100px 300px;
+    grid-template-rows: 150px 150px;
+    grid-gap: 10px;
+    margin: 0 0 20px 0;
+}
+
 .board {
     display: grid;
     width: 270px;
@@ -41,3 +50,36 @@
     width: 21px;
     margin: 2px 0 0 1px;
 }
+
+.info > div {
+    border: 1px solid black;
+}
+
+/*h2 {
+    grid-column-start: 1;
+    grid-column-end: 1;
+    grid-row-start 1;
+    grid-row-end: 1;
+}
+
+.messages {    
+    grid-column-start: 2;
+    grid-column-end: 2
+    grid-row-start 1;
+    grid-row-end: 1;
+
+}
+
+.instructions {
+    grid-column-start: 1;
+    grid-column-end: 1;
+    grid-row-start 2;
+    grid-row-end: 2;
+}
+
+.inventory {
+    grid-column-start: 2;
+    grid-column-end: 2;
+    grid-row-start 2;
+    grid-row-end: 2;
+}*/
