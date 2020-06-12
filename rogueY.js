@@ -45,13 +45,15 @@ document.addEventListener('DOMContentLoaded', function(){
         this.element = newHTMLTile;
     }
 
-    function Character(power, hitPoints, armor, name, image_location){
+    function Character(power, hitPoints, armor, name, type, image_location){
         this.name = name;
+        this.type = type;
         this.power = power;
         this.hitPoints = hitPoints;
         this.armor = armor;
         this.inventory = []; //a list of all useful items the character has picked up
         this.location = null;
+        this.focus = null;
         let icon = document.createElement("img");
         icon.classList.add(name);
         icon.setAttribute("alt", `${name} image`);
@@ -80,6 +82,13 @@ document.addEventListener('DOMContentLoaded', function(){
                 if (GAME_TILES[GAME_TILES[this.location][direction]].contains){ // if there is something to the tile to the north of the tile that the player is in
                     direction = resolveEncounter(this, direction);
                 }
+                if ((this.name === "player_character") && (direction)){
+                    if ((GAME_TILES[this.location].room != GAME_TILES[GAME_TILES[this.location][direction]].room)){  // if a player is entering a new room
+                        //the last part of that horrible if statement means "the id of the room of the tile to the north/south/east/west of the tile that the player character is moving from"
+                        console.log("old and new room IDs", GAME_TILES[this.location].room, GAME_TILES[this.location][direction]);
+                        newRoomEntry(this, GAME_TILES[GAME_TILES[this.location][direction]].room);
+                    }
+                }
                 switch (direction) {
                     case ("up"):
                         this.setLocation(GAME_TILES[this.location].up);
@@ -93,6 +102,9 @@ document.addEventListener('DOMContentLoaded', function(){
                     case ("left"):
                         //console.log("in left move function", this.location, direction);
                         this.setLocation(GAME_TILES[this.location].left);
+                        break;
+                    default:
+                        console.log("path is blocked");
                 }
             } else {
                 //console.log("Cannot move that direction");
@@ -131,6 +143,26 @@ document.addEventListener('DOMContentLoaded', function(){
                     cheer.play();
                 }
                 return direction;
+        }
+    }
+
+    function newRoomEntry(player, newRoomIndex){
+        console.log("newRoomIndex", newRoomIndex, `#room${newRoomIndex}`);
+        console.log(document.getElementById(`room${newRoomIndex}`));
+        document.getElementById(`room${newRoomIndex}`).style.visibility = "visible";
+        for (thisTile of GAME_TILES){
+            //console.log('this tile', thisTile);
+            if (thisTile.contains && (thisTile.contains.type === "monster")){
+                //console.log("tile.room and player.location", thisTile.room, GAME_TILES[player.location].room);
+                if (thisTile.room  === newRoomIndex){
+                    //console.log("Checking for monsters to activate.  This tile looks interesting", thisTile);
+                    let activatedMonster = thisTile.contains;
+                    let newMessage = document.createElement("li");
+                    newMessage.innerText = `${activatedMonster.name} is in the room!  They would like a word with you.`;
+                    document.getElementById("log_player1").appendChild(newMessage);
+                    activatedMonster.focus = player;
+                }
+            }
         }
     }
 
@@ -191,20 +223,21 @@ document.addEventListener('DOMContentLoaded', function(){
     }    
 
     createBoard();
-    const playerCharacter = new Character(1, 15, 0, "player_character", "./player.png");
-    const key1 = new Character(0, 1, 0 , "key", "./key.png");
-    const key2 = new Character(0, 1, 0 , "key", "./key.png");
+    const playerCharacter = new Character(1, 15, 0, "player_character", "player", "./player.png");
+    const key1 = new Character(0, 1, 0 , "key", "object", "./key.png");
+    const key2 = new Character(0, 1, 0 , "key", "object", "./key.png");
     for (let i=0; i<3; i++){
         let newMonsterInfo = coworkerNames.splice(Math.floor(Math.random()*coworkerNames.length), 1)[0];
         console.log("newMonsterInfo", newMonsterInfo);
-        let newMonster = new Character(1, 10, 0, newMonsterInfo.name, newMonsterInfo.image);
+        let newMonster = new Character(1, 10, 0, newMonsterInfo.name, "monster", newMonsterInfo.image);
         newMonster.setLocation(Math.floor(Math.random()*GAME_TILES.length));
     }
     playerCharacter.setLocation(0);
+    newRoomEntry(playerCharacter, GAME_TILES[0].room);
     key1.setLocation(Math.floor(Math.random()*GAME_TILES.length));
     key2.setLocation(Math.floor(Math.random()*GAME_TILES.length));
-    console.log('key1', key1.location);
-    console.log('key2', key2.location);
+    //console.log('key1', key1.location);
+    //console.log('key2', key2.location);
     console.log("Tile List", GAME_TILES);
     console.log("Player character", playerCharacter);
 

@@ -20,6 +20,7 @@
     grid-template-columns: 25px 25px 25px 25px 25px;
     grid-template-rows: 35px 35px 35px 35px 35px 35px;
     border: 5px double black;
+    visibility: hidden;
 }
 
 .square {
@@ -59,6 +60,13 @@ img {
     border: 1px solid black;
 }
 
+#log_player1 {
+    overflow: auto;
+}
+
+.messages {
+    overflow: auto;
+}
 /*h2 {
     grid-column-start: 1;
     grid-column-end: 1;
