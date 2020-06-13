@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function(){
     const roomWidth = 5;
     const roomCount = 6;
     const GAME_TILES = [];
+    const GAME_TILES_FOR_PATHS = {};
     const coworkerNames = [
         {name: "Robin", image: "./thisR.png"}, 
         {name: "Sal", image: "./thisS.png"}, 
@@ -54,6 +55,7 @@ document.addEventListener('DOMContentLoaded', function(){
         this.inventory = []; //a list of all useful items the character has picked up
         this.location = null;
         this.focus = null;
+        this.tapped = false;
         let icon = document.createElement("img");
         icon.classList.add(name);
         icon.setAttribute("alt", `${name} image`);
@@ -145,6 +147,133 @@ document.addEventListener('DOMContentLoaded', function(){
                 return direction;
         }
     }
+/*
+    function findPath(startVertexName, endVertexName){
+        //finds shortest path from monster to player using Dijkstra's Shortest Path algorithm & a javascript implementation of a heap data structure.
+        //These functions are copied from an assignment for a pre-bootcamp class, but are entirely my own work.
+        
+        //heap functions
+        function vertexToHeap(newBit, thisHeap){ // add a new value to heap and bubble it up to its proper position.  Heap is changed in-place
+            thisHeap.push(newBit);
+            if (thisHeap.length > 1){
+                newBitIndex = thisHeap.length - 1;
+                let superNodeIndex = Math.floor((newBitIndex-1)/2);
+                while (thisHeap[newBitIndex][3] < thisHeap[superNodeIndex][3]){
+                    let newTemp = thisHeap[newBitIndex].slice();
+                    thisHeap[newBitIndex] = thisHeap[superNodeIndex].slice();
+                    thisHeap[superNodeIndex] = newTemp;
+                    //thisHeap[newBitIndex] = [thisHeap[superNodeIndex], thisHeap[superNodeIndex] = thisHeap[newBitIndex]][0]; // trick for swapping array elements
+                    newBitIndex = superNodeIndex;
+                    if (superNodeIndex > 0){
+                        superNodeIndex = Math.floor((newBitIndex-1)/2);
+                    }
+                }
+            }
+        }
+        function vertexFromHeap(thisHeap){  //remove the top item from a heap, adjust heap properly, and return the element removed
+            let n = 0;
+            const meNext = thisHeap[n];
+            function shiftUp(){
+                if (2*n+2 <= thisHeap.length-1){ // if there are two subnodes
+                    if (thisHeap[2*n+1][3] <= thisHeap[2*n+2][3]){ // 
+                        thisHeap[n] = thisHeap[2*n+1].slice();
+                        n = 2*n+1;
+                    } else {
+                        thisHeap[n] = thisHeap[2*n+2].slice();
+                        n = 2*n+2;
+                    }
+                    shiftUp();
+                } else if (2*n+2 === thisHeap.length){  // if there's only one subnode
+                    thisHeap[n] = thisHeap[2*n+1].slice();
+                    n = 2*n+1;
+                    shiftUp();
+                } else { // if there are no subnodes, remove the last bumped element, shift all the subsequent ones over, and bubble each of them since they now have new supernodes
+                    const endElements = thisHeap.splice(n, thisHeap.length-n); // cut off all end elements
+                    for (let x=1;x<endElements.length;x++){ //iterate through all the ones we need to keep and add/bubble them
+                        vertexToHeap(endElements[x], thisHeap);
+                    }
+                }
+            }
+            shiftUp();
+            //console.log("Finished popping: " + JSON.stringify(thisHeap));
+            return meNext;
+        }
+
+        // fundamental variables
+        //const startVertexName = process.argv[2];
+        //const endVertexName = process.argv[3];
+        const alreadyExplored = {};
+        const distancesTo = {};
+        const pathsTo = {};
+        const vertexCount = GAME_TILES.length;
+        const priorityHeap = [];
+        let cheatList = [];
+
+        alreadyExplored[startVertexName] = true;
+        distancesTo[startVertexName] = 0;
+        pathsTo[startVertexName] = [startVertexName];
+        let currentVertex = startVertexName;
+
+        //shortest path algorithm
+        while (Object.keys(pathsTo).length < vertexCount){  // process a new vertex.  There will always be one - we'll throw out a lot of uselessly long heap entries at the end.
+            let theseNewEdges = GAME_TILES_FOR_PATHS[currentVertex];  // edges are of form [targetVertex, length]
+            for(let i=0;i<theseNewEdges.length;i++){			// add the new edges to the heap, as long as they lead to new vertices  BUT THEN STILL NEED TO CHECK WHEN PULLED LATER
+                if (!alreadyExplored[theseNewEdges[i][0]]){
+                    theseNewEdges[i].push(parseInt(currentVertex)); 	// NOW EDGE IS [targetVertex, length, sourceVertex]!!!!!
+                    theseNewEdges[i].push(distancesTo[theseNewEdges[i][2]] + theseNewEdges[i][1]); // NOW edge is [targetVertex, length, sourceVertex, Overall Length From Source If Added]  // I think heap should be sorted by that 4th one.
+                    vertexToHeap(theseNewEdges[i], priorityHeap);
+                } 
+            }
+            let nextEdge = vertexFromHeap(priorityHeap);
+            console.log('nextEdge', nextEdge);
+            while (alreadyExplored[nextEdge[0]]){
+                nextEdge = vertexFromHeap(priorityHeap); // choose a next edge to process and make sure it doesn't lead to an explored vertex
+            }
+
+            if (!alreadyExplored[nextEdge[0]]){ 		// we tried to minimize this earlier, but if the destination vertex has been discovered in the time since this was added to the heap
+                alreadyExplored[nextEdge[0]] = true;  // mark destination edge as explored
+                distancesTo[nextEdge[0]] = distancesTo[nextEdge[2]] + nextEdge[1]; // its distanceTo is the distance to source edge + edge length
+                pathsTo[nextEdge[0]] = pathsTo[nextEdge[2]].slice();  // its path is the path to the source vertex plus the new one
+                pathsTo[nextEdge[0]].push(nextEdge[0]);
+                currentVertex = nextEdge[0];
+            } else {
+                console.log("Something is very wrong");
+            }
+        }
+        console.log("Path to end vertex: " + JSON.stringify(pathsTo[endVertexName]));
+        console.log("Distance to end vertex: " + JSON.stringify(distancesTo[endVertexName]));
+    }
+    */
+
+    function findPath2(startPoint, endPoint){
+        console.log(`Finding path from ${startPoint} to ${endPoint}`);
+        let shortestPaths = {};
+        let pathFound = false;
+        shortestPaths[startPoint] = [startPoint];
+        let possibleDirections = ["up", "right", "down", "left"];
+        let edgeVertexList = []; //list of cells on the edge of exploration;
+        edgeVertexList[0] = startPoint;
+        
+        while (pathFound === false){
+            //console.log("edgeVertexList", edgeVertexList);
+            //console.log("shortestPaths", shortestPaths);
+            currentFocus = GAME_TILES[edgeVertexList.shift()];  // when all adjacent cells have been evaluated, move to the next cell on the queue.  I'm trusting the inherent organization of the map to ensure that this evaluates a next-closest cell every time.
+            //console.log("currentFocus", currentFocus);
+            for (direction of possibleDirections){          //look at all cells adjacent to this one
+                if (currentFocus[direction] && !shortestPaths[currentFocus[direction]]){      // if the adjacent cell exists & does not currently have a path registered
+                    //console.log("currentFocus, direction does not have a path registered", currentFocus)
+                    shortestPaths[currentFocus[direction]] = shortestPaths[currentFocus._id].concat(currentFocus._id); // register the shortest path to it
+                    if (currentFocus[direction] === endPoint){ // if we just registered a path to the target point, break out of both loops and return result
+                        pathFound = true;
+                        break;
+                    }
+                    edgeVertexList.push(currentFocus[direction]);     // add it as an edge focus\
+                }
+            }
+        }
+        return shortestPaths;
+    }
+
 
     function newRoomEntry(player, newRoomIndex){
         console.log("newRoomIndex", newRoomIndex, `#room${newRoomIndex}`);
@@ -161,6 +290,8 @@ document.addEventListener('DOMContentLoaded', function(){
                     newMessage.innerText = `${activatedMonster.name} is in the room!  They would like a word with you.`;
                     document.getElementById("log_player1").appendChild(newMessage);
                     activatedMonster.focus = player;
+                    let lotsOfPaths = findPath2(activatedMonster.location, player.location);
+                    console.log("lotsOfPaths", lotsOfPaths);
                 }
             }
         }
@@ -176,6 +307,13 @@ document.addEventListener('DOMContentLoaded', function(){
             for (let j=0; j<(roomHeight * roomWidth); j++){ // j is also the squareID of the current tile
                 let thisTile = new Tile(i, j, nextTileID, roomHeight, roomWidth);
                 GAME_TILES.push(thisTile);
+                GAME_TILES_FOR_PATHS[thisTile._id] = [];
+                for (thisDirection of ["up", "right", "down", "left"]){// construct game tile format that feeds into shortest path algorithm
+                    //console.log("this direction, this tile", thisDirection, thisTile);
+                    if (thisTile[thisDirection] != null){
+                        GAME_TILES_FOR_PATHS[thisTile._id].push([thisTile[thisDirection], 1]);
+                    }
+                }
                 newRoom.appendChild(thisTile.element);
                 nextTileID++;
             }
@@ -220,7 +358,8 @@ document.addEventListener('DOMContentLoaded', function(){
                 GAME_TILES[tile1ID].element.style.borderTop = "3px solid #C19A6B";
             
         }
-    }    
+    }
+    
 
     createBoard();
     const playerCharacter = new Character(1, 15, 0, "player_character", "player", "./player.png");
@@ -238,7 +377,8 @@ document.addEventListener('DOMContentLoaded', function(){
     key2.setLocation(Math.floor(Math.random()*GAME_TILES.length));
     //console.log('key1', key1.location);
     //console.log('key2', key2.location);
-    console.log("Tile List", GAME_TILES);
-    console.log("Player character", playerCharacter);
+    //console.log("Tile List", GAME_TILES);
+    //console.log("Player character", playerCharacter);
+    //console.log("forPaths", GAME_TILES_FOR_PATHS);
 
 })
