@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', function(){
     const roomCount = 6;
     const GAME_TILES = [];
     const GAME_TILES_FOR_PATHS = {};
+    const MONSTERS = [];
     const coworkerNames = [
         {name: "Robin", image: "./thisR.png"}, 
         {name: "Sal", image: "./thisS.png"}, 
@@ -13,6 +14,7 @@ document.addEventListener('DOMContentLoaded', function(){
         {name: "Harley", image: "./thisH.png"}
     ];
     const pronouns = ["He", "She", "They"];
+    const possibleDirections = ["up", "right", "down", "left"];
 
     document.onkeydown = function(e){
         console.log("keypress logged.  E:", e);
@@ -56,6 +58,7 @@ document.addEventListener('DOMContentLoaded', function(){
         this.location = null;
         this.focus = null;
         this.tapped = false;
+        this.nextMoves = [];
         let icon = document.createElement("img");
         icon.classList.add(name);
         icon.setAttribute("alt", `${name} image`);
@@ -83,6 +86,9 @@ document.addEventListener('DOMContentLoaded', function(){
                 //console.log("game tiles this location direction", GAME_TILES[GAME_TILES[this.location][direction]]);
                 if (GAME_TILES[GAME_TILES[this.location][direction]].contains){ // if there is something to the tile to the north of the tile that the player is in
                     direction = resolveEncounter(this, direction);
+                }
+                if (this.name === "player_character"){
+                    takeMonsterTurn(this);
                 }
                 if ((this.name === "player_character") && (direction)){
                     if ((GAME_TILES[this.location].room != GAME_TILES[GAME_TILES[this.location][direction]].room)){  // if a player is entering a new room
@@ -115,6 +121,57 @@ document.addEventListener('DOMContentLoaded', function(){
         }
     }
     
+    function takeMonsterTurn(player){
+        for (monster of MONSTERS){
+            if (monster.focus){
+                let lotsOfPaths = findPath2(monster.location, player.location);
+                //console.log("lotsOfPaths", lotsOfPaths);
+                monster.nextMoves = lotsOfPaths[player.location].slice(2); //the slice(2) at the end is an artifact of the paths algorithm - can remove it in later refactoring    
+                console.log("monster", monster);
+                switch (monster.nextMoves.shift()){
+                    case GAME_TILES[monster.location].up:
+                        if (player.location === GAME_TILES[monster.location].up){
+                            let newMessage = document.createElement("li");
+                            newMessage.innerText = `${monster.name} caught you!  Better luck next time.`;
+                            document.getElementById("log_player1").appendChild(newMessage);
+                            document.getElementById("log_player1").style.background = "red";
+                        }
+                        monster.move("up");
+                        break;
+                    case GAME_TILES[monster.location].right:
+                        if (player.location === GAME_TILES[monster.location].right){
+                            let newMessage = document.createElement("li");
+                            newMessage.innerText = `${monster.name} caught you!  Better luck next time.`;
+                            document.getElementById("log_player1").appendChild(newMessage);
+                            document.getElementById("log_player1").style.background = "red";
+                        }
+                        monster.move("right");
+                        break;
+                    case GAME_TILES[monster.location].down:
+                        if (player.location === GAME_TILES[monster.location].down){
+                            let newMessage = document.createElement("li");
+                            newMessage.innerText = `${monster.name} caught you!  Better luck next time.`;
+                            document.getElementById("log_player1").appendChild(newMessage);
+                            document.getElementById("log_player1").style.background = "red";
+                        }
+                        monster.move("down");
+                        break;
+                    case GAME_TILES[monster.location].left:
+                        if (player.location === GAME_TILES[monster.location].left){
+                            let newMessage = document.createElement("li");
+                            newMessage.innerText = `${monster.name} caught you!  Better luck next time.`;
+                            document.getElementById("log_player1").appendChild(newMessage);
+                            document.getElementById("log_player1").style.background = "red";
+                        }
+                        monster.move("left");
+                        break;
+                    default:
+                        console.log("monster move failed");
+                }
+            }
+        }
+    }
+
     function resolveEncounter(player, direction){  // resolve encounter and return unchanged direction if movement is ok, or null if movement should be canceled
         let foundObject = GAME_TILES[GAME_TILES[player.location][direction]].contains;
         let newMessage = document.createElement("li");
@@ -250,7 +307,6 @@ document.addEventListener('DOMContentLoaded', function(){
         let shortestPaths = {};
         let pathFound = false;
         shortestPaths[startPoint] = [startPoint];
-        let possibleDirections = ["up", "right", "down", "left"];
         let edgeVertexList = []; //list of cells on the edge of exploration;
         edgeVertexList[0] = startPoint;
         
@@ -290,8 +346,6 @@ document.addEventListener('DOMContentLoaded', function(){
                     newMessage.innerText = `${activatedMonster.name} is in the room!  They would like a word with you.`;
                     document.getElementById("log_player1").appendChild(newMessage);
                     activatedMonster.focus = player;
-                    let lotsOfPaths = findPath2(activatedMonster.location, player.location);
-                    console.log("lotsOfPaths", lotsOfPaths);
                 }
             }
         }
@@ -370,6 +424,7 @@ document.addEventListener('DOMContentLoaded', function(){
         console.log("newMonsterInfo", newMonsterInfo);
         let newMonster = new Character(1, 10, 0, newMonsterInfo.name, "monster", newMonsterInfo.image);
         newMonster.setLocation(Math.floor(Math.random()*GAME_TILES.length));
+        MONSTERS.push(newMonster);
     }
     playerCharacter.setLocation(0);
     newRoomEntry(playerCharacter, GAME_TILES[0].room);
