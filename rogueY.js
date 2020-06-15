@@ -85,7 +85,22 @@ document.addEventListener('DOMContentLoaded', function(){
             console.log("moving", this, " in direction", direction);
             if (GAME_TILES[this.location][direction]){ // make sure that there is a tile in the direction the character is moving (i.e. it's not a wall)
                 if (this.name === "player_character"){ // if the thing performing a move is a character, then that signals that a turn is passing, and monsters should take a turn too, before the character performs theirs.
-                    takeMonsterTurn(this);
+                    // but first, make sure that a bicycle isn't giving the player a free move.
+                    let skipMonsterTurn = false;
+                    for (item of this.inventory){
+                        if (item.name === "bicycle"){
+                            if (item.tapped === true){
+                                item.tapped = false;
+                            } else {
+                                item.tapped = true;
+                                skipMonsterTurn = true;
+                            }
+                        }
+                    }
+                    console.log("skipMonsterTurn", skipMonsterTurn);
+                    if (!skipMonsterTurn){
+                        takeMonsterTurn(this);
+                    }
                 }
                 if (GAME_TILES[GAME_TILES[this.location][direction]].contains){ // if there is something to the tile to the north of the tile that the player is in, resolve that encounter
                     console.log("calling resolveEncounter", this, direction);
@@ -169,7 +184,7 @@ document.addEventListener('DOMContentLoaded', function(){
                         for (thisObject of movingCharacter.inventory){ // if this is the 2nd key the player has found, end the game in a win
                                 console.log("thisObject", thisObject);
                                 console.log("movingCharacter inventory", movingCharacter.inventory);
-                                if (thisObject.name === "a key"){
+                                if (thisObject.name === "key"){
                                     gameOver = true;
                                 }
                         }
