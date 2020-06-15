@@ -1,17 +1,21 @@
 .info {
     display: grid;
     width: 410px;
-    grid-template-columns: 100px 300px;
-    grid-template-rows: 120px 120px;
+    grid-template-columns: 360px 280px;
+    grid-template-rows: 300px 175px 175px;
     grid-gap: 10px;
     margin: 0 0 20px 0;
 }
 
 .board {
+    grid-column-start: 2;
+    grid-column-end: 2;
+    grid-row-start: 1;
+    grid-row-end: 4;
     display: grid;
     width: 270px;
     grid-template-columns: 135px 135px;
-    grid-template-rows: 220px 220px;
+    grid-template-rows: 220px 220px 200px;;
     border: 5px double black;
 }
 
@@ -21,6 +25,7 @@
     grid-template-rows: 35px 35px 35px 35px 35px 35px;
     border: 5px double black;
     visibility: hidden;
+    height: 210px;
 }
 
 .square {
@@ -57,7 +62,7 @@ img {
     height: 30px;
 }
 
-.info > div {
+.inventory{
     border: 1px solid black;
 }
 
@@ -67,6 +72,24 @@ img {
 
 .messages {
     overflow: auto;
+    border: 1px solid black;
+}
+
+h3 {
+    text-align: center;
+}
+
+li > img {
+    height: 20px;
+}
+
+.legend > ul {
+    list-style-type: none;
+    padding: 0 10px 0 10px;
+}
+
+li {
+    margin: 10px 0 5px 0;
 }
 /*h2 {
     grid-column-start: 1;

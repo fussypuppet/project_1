@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function(){
             }
         }
         this.move = function(direction){ // validate move and call any move-triggered functions/events, then call setLocation to actually stick the character in the new spot
-            console.log("moving", this, " in direction", direction);
+            //console.log("moving", this, " in direction", direction);
             if (GAME_TILES[this.location][direction]){ // make sure that there is a tile in the direction the character is moving (i.e. it's not a wall)
                 if (this.name === "player_character"){ // if the thing performing a move is a character, then that signals that a turn is passing, and monsters should take a turn too, before the character performs theirs.
                     // but first, make sure that a bicycle isn't giving the player a free move.
@@ -97,13 +97,12 @@ document.addEventListener('DOMContentLoaded', function(){
                             }
                         }
                     }
-                    console.log("skipMonsterTurn", skipMonsterTurn);
                     if (!skipMonsterTurn){
                         takeMonsterTurn(this);
                     }
                 }
                 if (GAME_TILES[GAME_TILES[this.location][direction]].contains){ // if there is something to the tile to the north of the tile that the player is in, resolve that encounter
-                    console.log("calling resolveEncounter", this, direction);
+                    //console.log("calling resolveEncounter", this, direction);
                     let encounterResult = resolveEncounter(this, direction);
                     if (encounterResult === "cancel move"){
                         return;
@@ -116,7 +115,7 @@ document.addEventListener('DOMContentLoaded', function(){
                         newRoomEntry(this, GAME_TILES[GAME_TILES[this.location][direction]].room);
                     }
                 }
-                console.log("in move function switch direction.  This.location is currently ", this.location);
+                //console.log("in move function switch direction.  This.location is currently ", this.location);
                 switch (direction) { // after checking for special events, place character in new tile
                     case ("up"):
                         this.setLocation(GAME_TILES[this.location].up);
@@ -137,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function(){
             } else {
                 //console.log("Cannot move that direction");
             }
-            console.log("Character moved.  Current position: " + this.location);
+            //console.log("Character moved.  Current position: " + this.location);
         }
     }
     
@@ -147,7 +146,7 @@ document.addEventListener('DOMContentLoaded', function(){
                 let lotsOfPaths = findPath(monster.location, player.location);
                 //console.log("lotsOfPaths", lotsOfPaths);
                 monster.nextMoves = lotsOfPaths[player.location].slice(2); //the slice(2) at the end is an artifact of the paths algorithm - can remove it in later refactoring    
-                console.log("monster", monster);
+                //console.log("monster", monster);
                 switch (monster.nextMoves.shift()){
                     case GAME_TILES[monster.location].up:
                         monster.move("up");
@@ -288,7 +287,7 @@ document.addEventListener('DOMContentLoaded', function(){
                 if ((currentFocus[direction] != null) && !shortestPaths[currentFocus[direction]]){      // if the adjacent cell exists & does not currently have a path registered.  Beware of cell 0 being falsy
                     shortestPaths[currentFocus[direction]] = shortestPaths[currentFocus._id].concat(currentFocus._id); // register the shortest path to it
                     if (currentFocus[direction] === endPoint){ // if we just registered a path to the target point, break out of both loops and return result
-                        console.log("finishing off shortest path creation");
+                        //console.log("finishing off shortest path creation");
                         shortestPaths[currentFocus[direction]] = shortestPaths[currentFocus[direction]].concat(GAME_TILES[currentFocus[direction]]._id);   // must add the endpoint to the path, or else monsters will pause just short of their prey
                         pathFound = true;
                         break;

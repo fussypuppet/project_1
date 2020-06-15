@@ -9,19 +9,34 @@
 </head>
 <body>
     <h1>Oh No!</h1>
-    <p>It's time to go home!  Find both your keys and avoid co-workers to win</p>
+    <p>All done at the office!  Time to go home.  Find both your keys while avoiding co-workers to win</p>
+    <form><input type="submit" value="Start new game"></form>
     <div class="info">
-        <div></div>
+        <div class="legend">
+            <h3>Legend</h3>
+            <ul>
+                <li><img src='./player.png' alt="player_icon">: you, the player</li>
+                <li><img src='./key.png' alt='key icon'>: a key.  Collect two keys to win</li>
+                <li><img src='./bike.png' alt='bike icon'>: your bicycle.  Collect to move faster</li>
+                <li><img src='./note.png' alt='headphones icon'>: your headphones.  Collect to sometimes ignore co-worker attacks</li>
+                <li>
+                    <img src='./thisD.png' alt='a coworker icon'>
+                    <img src='./thisH.png' alt='a coworker icon'>
+                    <img src='./thisM.png' alt='a coworker icon'>
+                    <img src='./thisR.png' alt='a coworker icon'>
+                    <img src='./thisS.png' alt='a coworker icon'>: Your co-workers.  Run away!
+                </li>
+            </ul>
+        </div>
+        <div class="board">
+        </div>
         <div class="inventory">
             <h3>Inventory</h3>
             <ul id="inventory_player1"></ul>
         </div>
-        <form><input type="submit" value="Start new game"></form>
         <div class="messages">
             <h3>Message Log</h3>
             <ul id="log_player1"></ul>
         </div>
-    </div>
-    <div class="board">
     </div>
 </html>
