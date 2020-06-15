@@ -216,8 +216,19 @@ document.addEventListener('DOMContentLoaded', function(){
                 console.log("NPC-NPC collision");
                 return "cancel move";
             } else if (foundObject.type === "player"){  // if monster has caught a player, end game in a loss
-                console.log("Losting game at tile", GAME_TILES[GAME_TILES[movingCharacter.location][direction]]);
-                loseGame(movingCharacter.name, foundObject, GAME_TILES[GAME_TILES[movingCharacter.location][direction]]._id);
+                let hasHeadphones = false;
+                for (item of foundObject.inventory){
+                    if (item.name === "headphones"){ // if player has headphones, let them ignore when the monster intercepts them (but now when they walk into a monster)
+                        hasHeadphones = true;
+                    }
+                }
+                if (!hasHeadphones){
+                    console.log("Lost game at tile", GAME_TILES[GAME_TILES[movingCharacter.location][direction]]);
+                    loseGame(movingCharacter.name, foundObject, GAME_TILES[GAME_TILES[movingCharacter.location][direction]]._id);
+                } else {
+                    logNewMessage("You successfully pretend that you can't hear your coworker!");
+                    return "cancel move";
+                }
             } else {
                 console.log("error in resolveEncounter - monster encountered unknown object");
             }
