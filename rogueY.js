@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function(){
         }
         this.move = function(direction){ // validate move and call any move-triggered functions/events, then call setLocation to actually stick the character in the new spot
             if (GAME_TILES[this.location][direction]){ // make sure that there is a tile in the direction the character is moving (i.e. it's not a wall)
-                if (this.name === "player_character"){ // if the thing performing a move is a character, then that signals that a turn is passing, and monsters should take a turn too, before the character performs theirs.
+                if (this.type === "player"){ // if the thing performing a move is a character, then that signals that a turn is passing, and monsters should take a turn too, before the character performs theirs.
                     // but first, make sure that a bicycle isn't giving the player a free move.
                     let skipMonsterTurn = false;
                     for (item of this.inventory){
@@ -106,28 +106,13 @@ document.addEventListener('DOMContentLoaded', function(){
                         return;
                     }
                 }
-                if (this.name === "player_character"){
+                if (this.type === "player"){
                     if ((GAME_TILES[this.location].room != GAME_TILES[GAME_TILES[this.location][direction]].room)){  // if a player is entering a new room, trigger newRoomEntry event
                         //the last part of the previous line's IF statement means "the id of the room of the tile to the north/south/east/west of the tile that the player character is moving from"
                         newRoomEntry(this, GAME_TILES[GAME_TILES[this.location][direction]].room);
                     }
                 }
-                switch (direction) { // after checking for special events, place character in new tile
-                    case ("up"):
-                        this.setLocation(GAME_TILES[this.location].up);
-                        break;
-                    case ("right"):
-                        this.setLocation(GAME_TILES[this.location].right);
-                        break;
-                    case ("down"):
-                        this.setLocation(GAME_TILES[this.location].down);
-                        break;
-                    case ("left"):
-                        this.setLocation(GAME_TILES[this.location].left);
-                        break;
-                    default:
-                        console.log("path is blocked");
-                }
+                this.setLocation(GAME_TILES[this.location][direction]); // move character the correct direction from its current tile.
             }
         }
     }
@@ -135,10 +120,7 @@ document.addEventListener('DOMContentLoaded', function(){
     function takeMonsterTurn(player){
         for (monster of CHARACTERS){
             if (monster.focus){ // only monster-type characters ever have a focus value
-                let lotsOfPaths = findPath(monster.location, player.location);
-                //console.log("lotsOfPaths", lotsOfPaths);
-                monster.nextMoves = lotsOfPaths[player.location].slice(2); //the slice(2) at the end is an artifact of the paths algorithm - can remove it in later refactoring    
-                //console.log("monster", monster);
+                monster.nextMoves = findPath(monster.location, player.location);  // find the shortest path to the player, and move accordingly.
                 switch (monster.nextMoves.shift()){
                     case GAME_TILES[monster.location].up:
                         monster.move("up");
@@ -164,7 +146,7 @@ document.addEventListener('DOMContentLoaded', function(){
             Player -> item (pick it up!), 
             Player -> monster (lose game), 
             Monster -> Player (lose game), 
-            Monster -> NPC (just cancel move for now and figure something out as a bonus later).*/
+            Monster -> NPC (cancel move for now and figure something out as a bonus later).*/
         let foundObject = GAME_TILES[GAME_TILES[movingCharacter.location][direction]].contains;
         if (movingCharacter.type === "player") {
             if (foundObject.type === "object") {  // if a player encounters an object, pick it up and check for win
@@ -173,13 +155,10 @@ document.addEventListener('DOMContentLoaded', function(){
                     case "key":
                         let gameOver = false;
                         for (thisObject of movingCharacter.inventory){ // if this is the 2nd key the player has found, end the game in a win
-                                console.log("thisObject", thisObject);
-                                console.log("movingCharacter inventory", movingCharacter.inventory);
                                 if (thisObject.name === "key"){
                                     gameOver = true;
                                 }
                         }
-                        //console.log("adding foundObject to inventory", foundObject);
                         addToInventory(foundObject);
                         if (gameOver === true){
                             logNewMessage("Congratulations! You won!");
@@ -204,12 +183,11 @@ document.addEventListener('DOMContentLoaded', function(){
             }
         } else if (movingCharacter.type === "monster"){
             if (foundObject.type === "object" || foundObject.type === "monster"){
-                console.log("NPC-NPC collision");
                 return "cancel move";
             } else if (foundObject.type === "player"){  // if monster has caught a player, end game in a loss
                 let hasHeadphones = false;
                 for (item of foundObject.inventory){
-                    if (item.name === "headphones"){ // if player has headphones, let them ignore when the monster intercepts them (but now when they walk into a monster)
+                    if (item.name === "headphones"){ // if player has headphones, let them ignore when the monster intercepts them (but not when they walk into a monster)
                         hasHeadphones = true;
                     }
                 }
@@ -220,11 +198,7 @@ document.addEventListener('DOMContentLoaded', function(){
                     logNewMessage("You successfully pretend that you can't hear your coworker!");
                     return "cancel move";
                 }
-            } else {
-                console.log("error in resolveEncounter - monster encountered unknown object");
             }
-        } else {
-            console.log("error in resolveEncounter - unknown type of moving character");
         }
         function addToInventory(thisItem){
             movingCharacter.inventory.push(foundObject);
@@ -238,7 +212,6 @@ document.addEventListener('DOMContentLoaded', function(){
     function loseGame(monsterName, player, tileId){
         document.getElementById("square" + tileId).style.background = "red";
         logNewMessage(`${monsterName} caught you!  Better luck next time.`);
-        //document.getElementById("log_player1").style.background = "red";
         gameActive = false;
         document.querySelector("input").style.background = "green";
     }
@@ -262,39 +235,29 @@ document.addEventListener('DOMContentLoaded', function(){
         // which sounds inefficient, but really isn't, since the algorithm ensures that the While loop will run at most a number of times equal to the number of cells.
         // THIS VERSION COULD BE IMPROVED BY MODIFYING IT TO FIND A RANDOM SHORTEST PATH.  Right now the path monsters will take while pursuing players is predictable.
         // IT ALSO RETURNS PATH ARRAYS WHERE THE FIRST TWO ENTRIES ARE ALWAYS THE ORIGIN CELL.  Interesting entries only start at index [2].
-        console.log(`Finding path from ${startPoint} to ${endPoint}`);
         let shortestPaths = {};
         let pathFound = false;
         shortestPaths[startPoint] = [startPoint];
         let edgeVertexList = []; //list of cells on the edge of exploration;
         edgeVertexList[0] = startPoint;  
-        //console.log("just before while loop.  shortestPaths", shortestPaths);
         while (pathFound === false){
-            //console.log("in while loop.  shortestPaths", shortestPaths);
             currentFocus = GAME_TILES[edgeVertexList.shift()];  // when all adjacent cells have been evaluated, move to the next cell on the queue.
             for (direction of possibleDirections){          //look at all cells adjacent to this one
-                //console.log('currentFocus', currentFocus);
-                //console.log("about to evaluate direction " + direction + " from tile ID " + currentFocus._id + " which is tile " + currentFocus[direction]);
-                //console.log("incomplete shortestPaths", shortestPaths);
                 if ((currentFocus[direction] != null) && !shortestPaths[currentFocus[direction]]){      // if the adjacent cell exists & does not currently have a path registered.  Beware of cell 0 being falsy
                     shortestPaths[currentFocus[direction]] = shortestPaths[currentFocus._id].concat(currentFocus._id); // register the shortest path to it
                     if (currentFocus[direction] === endPoint){ // if we just registered a path to the target point, break out of both loops and return result
-                        //console.log("finishing off shortest path creation");
                         shortestPaths[currentFocus[direction]] = shortestPaths[currentFocus[direction]].concat(GAME_TILES[currentFocus[direction]]._id);   // must add the endpoint to the path, or else monsters will pause just short of their prey
                         pathFound = true;
                         break;
                     }
-                    edgeVertexList.push(currentFocus[direction]);     // add it as an edge focus\
+                    edgeVertexList.push(currentFocus[direction]);     // add it as an edge focus
                 }
             }
         }
-        //console.log('shortestPaths', shortestPaths);
-        return shortestPaths;
+        return shortestPaths[endPoint].slice(2); //the slice(2) at the end is an artifact of the paths algorithm - can remove it in later refactoring
     }
 
     function newRoomEntry(player, newRoomIndex){ // if player is entering a new room, reveal the room on the map, and activate any monsters inside
-        console.log("newRoomIndex", newRoomIndex, `#room${newRoomIndex}`);
-        console.log(document.getElementById(`room${newRoomIndex}`));
         document.getElementById(`room${newRoomIndex}`).style.visibility = "visible";
         for (thisTile of GAME_TILES){
             if (thisTile.contains && (thisTile.contains.type === "monster")){
@@ -368,6 +331,8 @@ document.addEventListener('DOMContentLoaded', function(){
         }
     }
 
+
+    // create board and spawn player, monsters, and items
     createBoard();
     const playerCharacter = new Character("player_character", "player", "./player.png");
     const key1 = new Character("key", "object", "./key.png");
@@ -376,7 +341,6 @@ document.addEventListener('DOMContentLoaded', function(){
     const headphones = new Character("headphones", "object", "./note.png");
     for (let i=0; i<3; i++){
         let newMonsterInfo = coworkerNames.splice(Math.floor(Math.random()*coworkerNames.length), 1)[0];
-        console.log("newMonsterInfo", newMonsterInfo);
         let newMonster = new Character(newMonsterInfo.name, "monster", newMonsterInfo.image);
         newMonster.setLocation(Math.floor(Math.random()*(GAME_TILES.length-1))+1);
     }
@@ -386,10 +350,4 @@ document.addEventListener('DOMContentLoaded', function(){
     key2.setLocation(Math.floor(Math.random()*(GAME_TILES.length-1))+1);
     bicycle.setLocation(Math.floor(Math.random()*(GAME_TILES.length-1))+1);
     headphones.setLocation(Math.floor(Math.random()*(GAME_TILES.length-1))+1);
-    //console.log('key1', key1.location);
-    //console.log('key2', key2.location);
-    //console.log("Tile List", GAME_TILES);
-    //console.log("Player character", playerCharacter);
-    //console.log("forPaths", GAME_TILES_FOR_PATHS);
-
 })
