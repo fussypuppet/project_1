@@ -14,21 +14,25 @@ document.addEventListener('DOMContentLoaded', function(){
         {name: "Harley", image: "./thisH.png"}
     ];
     const possibleDirections = ["up", "right", "down", "left"];
+    let gameActive = true;
+    document.querySelector("input").style.background = "";
 
     document.onkeydown = function(e){
-        //console.log("keypress logged.  event:", e);
-        switch (e.key){
-            case "ArrowUp":
-                playerCharacter.move("up");
-                break;
-            case "ArrowRight":
-                playerCharacter.move("right");
-                break;
-            case "ArrowDown":
-                playerCharacter.move("down");
-                break;
-            case "ArrowLeft":
-                playerCharacter.move("left");
+        if (gameActive){
+            //console.log("keypress logged.  event:", e);
+            switch (e.key){
+                case "ArrowUp":
+                    playerCharacter.move("up");
+                    break;
+                case "ArrowRight":
+                    playerCharacter.move("right");
+                    break;
+                case "ArrowDown":
+                    playerCharacter.move("down");
+                    break;
+                case "ArrowLeft":
+                    playerCharacter.move("left");
+            }
         }
     }
 
@@ -180,12 +184,16 @@ document.addEventListener('DOMContentLoaded', function(){
                             logNewMessage("Congratulations! You won!");
                             let cheer = new Audio("./1_person_cheering-Jett_Rifkin-1851518140.mp3")
                             cheer.play();
+                            gameActive = false; 
+                            document.querySelector("input").style.background = "green";
                         }
                         return direction;
                 }
             } else if (foundObject.type === "monster") {  // if player has thrown themselves at a monster, end the game in a loss.
                 logNewMessage(`${monster.name} caught you!  Better luck next time.`);
                 document.getElementById("log_player1").style.background = "red";
+                gameActive = false;
+                document.querySelector("input").style.background = "green";
             } else {
                 console.log("error in resolveEncounter - player encountered unknown object");
             }
@@ -195,6 +203,8 @@ document.addEventListener('DOMContentLoaded', function(){
             } else if (foundObject.type === "player"){  // if monster has caught a player, end game in a loss
                 logNewMessage(`${monster.name} caught you!  Better luck next time.`);
                 document.getElementById("log_player1").style.background = "red";
+                gameActive = false;
+                document.querySelector("input").style.background = "green";
             } else {
                 console.log("error in resolveEncounter - monster encountered unknown object");
             }
