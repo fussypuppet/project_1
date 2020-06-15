@@ -53,7 +53,8 @@
 }
 
 img {
-    width: 21px;
+    /*width: 21px;*/
+    height: 30px;
 }
 
 .info > div {

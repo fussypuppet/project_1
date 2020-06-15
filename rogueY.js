@@ -50,12 +50,9 @@ document.addEventListener('DOMContentLoaded', function(){
         this.element = newHTMLTile;
     }
 
-    function Character(power, hitPoints, armor, name, type, image_location){
+    function Character(name, type, image_location){
         this.name = name;
         this.type = type;
-        this.power = power;
-        this.hitPoints = hitPoints;
-        this.armor = armor;
         this.inventory = []; //a list of all useful items the character has picked up
         this.location = null;
         this.focus = null;
@@ -165,23 +162,19 @@ document.addEventListener('DOMContentLoaded', function(){
         let foundObject = GAME_TILES[GAME_TILES[movingCharacter.location][direction]].contains;
         if (movingCharacter.type === "player") {
             if (foundObject.type === "object") {  // if a player encounters an object, pick it up and check for win
-                logNewMessage("You have found a " + foundObject.name);
+                logNewMessage("You have found " + foundObject.name);
                 switch (foundObject.name) {
                     case "key":
                         let gameOver = false;
                         for (thisObject of movingCharacter.inventory){ // if this is the 2nd key the player has found, end the game in a win
                                 console.log("thisObject", thisObject);
                                 console.log("movingCharacter inventory", movingCharacter.inventory);
-                                if (thisObject.name === "key"){
+                                if (thisObject.name === "a key"){
                                     gameOver = true;
                                 }
                         }
-                        console.log("adding foundObject to inventory", foundObject);
-                        movingCharacter.inventory.push(foundObject);
-                        foundObject.setLocation(null);
-                        let newInventoryItem = document.createElement("li");
-                        newInventoryItem.innerText = "a key";
-                        document.getElementById("inventory_player1").appendChild(newInventoryItem);
+                        //console.log("adding foundObject to inventory", foundObject);
+                        addToInventory(foundObject);
                         if (gameOver === true){
                             logNewMessage("Congratulations! You won!");
                             let cheer = new Audio("./1_person_cheering-Jett_Rifkin-1851518140.mp3")
@@ -189,6 +182,13 @@ document.addEventListener('DOMContentLoaded', function(){
                             gameActive = false; 
                             document.querySelector("input").style.background = "green";
                         }
+                        break;
+                    case "bicycle":
+                        addToInventory(foundObject);
+                        break;
+                    case "headphones":
+                        addToInventory(foundObject);
+                        break;
                 }
             } else if (foundObject.type === "monster") {  // if player has thrown themselves at a monster, end the game in a loss.
                 loseGame(foundObject.name, movingCharacter, GAME_TILES[GAME_TILES[movingCharacter.location][direction]]._id);
@@ -208,6 +208,13 @@ document.addEventListener('DOMContentLoaded', function(){
             }
         } else {
             console.log("error in resolveEncounter - unknown type of moving character");
+        }
+        function addToInventory(thisItem){
+            movingCharacter.inventory.push(foundObject);
+            foundObject.setLocation(null);
+            let newInventoryItem = document.createElement("li");
+            newInventoryItem.innerText = foundObject.name;
+            document.getElementById("inventory_player1").appendChild(newInventoryItem);
         }
     }
 
@@ -345,19 +352,23 @@ document.addEventListener('DOMContentLoaded', function(){
     }
 
     createBoard();
-    const playerCharacter = new Character(1, 15, 0, "player_character", "player", "./player.png");
-    const key1 = new Character(0, 1, 0 , "key", "object", "./key.png");
-    const key2 = new Character(0, 1, 0 , "key", "object", "./key.png");
+    const playerCharacter = new Character("player_character", "player", "./player.png");
+    const key1 = new Character("key", "object", "./key.png");
+    const key2 = new Character("key", "object", "./key.png");
+    const bicycle = new Character("bicycle", "object", "./bike.png");
+    const headphones = new Character("headphones", "object", "./note.png");
     for (let i=0; i<3; i++){
         let newMonsterInfo = coworkerNames.splice(Math.floor(Math.random()*coworkerNames.length), 1)[0];
         console.log("newMonsterInfo", newMonsterInfo);
-        let newMonster = new Character(1, 10, 0, newMonsterInfo.name, "monster", newMonsterInfo.image);
+        let newMonster = new Character(newMonsterInfo.name, "monster", newMonsterInfo.image);
         newMonster.setLocation(Math.floor(Math.random()*(GAME_TILES.length-1))+1);
     }
     playerCharacter.setLocation(0);
     newRoomEntry(playerCharacter, GAME_TILES[0].room);
     key1.setLocation(Math.floor(Math.random()*(GAME_TILES.length-1))+1);
     key2.setLocation(Math.floor(Math.random()*(GAME_TILES.length-1))+1);
+    bicycle.setLocation(Math.floor(Math.random()*(GAME_TILES.length-1))+1);
+    headphones.setLocation(Math.floor(Math.random()*(GAME_TILES.length-1))+1);
     //console.log('key1', key1.location);
     //console.log('key2', key2.location);
     //console.log("Tile List", GAME_TILES);
