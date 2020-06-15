@@ -58,7 +58,6 @@
 }
 
 img {
-    /*width: 21px;*/
     height: 30px;
 }
 
@@ -91,31 +90,3 @@ li > img {
 li {
     margin: 10px 0 5px 0;
 }
-/*h2 {
-    grid-column-start: 1;
-    grid-column-end: 1;
-    grid-row-start 1;
-    grid-row-end: 1;
-}
-
-.messages {    
-    grid-column-start: 2;
-    grid-column-end: 2
-    grid-row-start 1;
-    grid-row-end: 1;
-
-}
-
-.instructions {
-    grid-column-start: 1;
-    grid-column-end: 1;
-    grid-row-start 2;
-    grid-row-end: 2;
-}
-
-.inventory {
-    grid-column-start: 2;
-    grid-column-end: 2;
-    grid-row-start 2;
-    grid-row-end: 2;
-}*/

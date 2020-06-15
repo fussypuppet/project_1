@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function(){
+    // global variables
     const roomHeight = 6;
     const roomWidth = 5;
     const roomCount = 6;
@@ -14,8 +15,9 @@ document.addEventListener('DOMContentLoaded', function(){
     ];
     const possibleDirections = ["up", "right", "down", "left"];
     let gameActive = true;
-    document.querySelector("input").style.background = "";
 
+
+    //event listener for arrow key keypresses.  Game reset button works via default form submission refresh
     document.onkeydown = function(e){
         if (gameActive){
             //console.log("keypress logged.  event:", e);
@@ -35,6 +37,8 @@ document.addEventListener('DOMContentLoaded', function(){
         }
     }
 
+
+    // object constructors
     function Tile(roomID, squareID, nextTileID, roomHeight, roomWidth) {
         this.room = roomID;  //the id of the room on the game board // this can basically be an array index from 0 to <room count>
         this.square = squareID; //the id of the tile within the room's array of tiles // this should be an array index from 0 to <room size>
@@ -55,34 +59,29 @@ document.addEventListener('DOMContentLoaded', function(){
         this.type = type;
         this.inventory = []; //a list of all useful items the character has picked up
         this.location = null;
-        this.focus = null;
+        this.focus = null; //the target this character is pursuing, if this is a co-worker
         this.tapped = false;
-        this.nextMoves = [];
+        this.nextMoves = [];  // fastest path to target, if this is a co-worker
         let icon = document.createElement("img");
         icon.classList.add(name);
         icon.setAttribute("alt", `${name} image`);
         icon.setAttribute("src", image_location);
         this.image = icon;
         CHARACTERS.push(this);
-        this.setLocation = function(location){ // make sure character is nowhere else, and place them in the indicated location
-            //console.log("setting location to " + location);
+        this.setLocation = function(location){ // Used in character moves and game initialization.  Make sure character is nowhere else, and place them in the indicated location
             for (tile of GAME_TILES){
-                if ((tile.contains === this) && (tile._id != location)){  // remove the character from the old tile
-                    //console.log("Removing character from old location");
+                if ((tile.contains === this) && (tile._id != location)){  // remove the character from the old tile, if any
                     tile.contains = "";
                     tile.element.innerHTML = "";
                 }
-                if (tile._id === location){
-                    //console.log("in middle of setLocation.  Tile:", tile, location, this);
+                if (tile._id === location){ // put character in new tile
                     tile.contains = this;
                     tile.element.appendChild(this.image);
                     this.location = tile._id;
-                    //console.log("at end of setLocation.  Tile:", tile, location, this); 
                 }
             }
         }
         this.move = function(direction){ // validate move and call any move-triggered functions/events, then call setLocation to actually stick the character in the new spot
-            //console.log("moving", this, " in direction", direction);
             if (GAME_TILES[this.location][direction]){ // make sure that there is a tile in the direction the character is moving (i.e. it's not a wall)
                 if (this.name === "player_character"){ // if the thing performing a move is a character, then that signals that a turn is passing, and monsters should take a turn too, before the character performs theirs.
                     // but first, make sure that a bicycle isn't giving the player a free move.
@@ -101,8 +100,7 @@ document.addEventListener('DOMContentLoaded', function(){
                         takeMonsterTurn(this);
                     }
                 }
-                if (GAME_TILES[GAME_TILES[this.location][direction]].contains){ // if there is something to the tile to the north of the tile that the player is in, resolve that encounter
-                    //console.log("calling resolveEncounter", this, direction);
+                if (GAME_TILES[GAME_TILES[this.location][direction]].contains){ // if there is something occupying the destination tile, resolve that encounter
                     let encounterResult = resolveEncounter(this, direction);
                     if (encounterResult === "cancel move"){
                         return;
@@ -110,12 +108,10 @@ document.addEventListener('DOMContentLoaded', function(){
                 }
                 if (this.name === "player_character"){
                     if ((GAME_TILES[this.location].room != GAME_TILES[GAME_TILES[this.location][direction]].room)){  // if a player is entering a new room, trigger newRoomEntry event
-                        //the last part of that horrible if statement means "the id of the room of the tile to the north/south/east/west of the tile that the player character is moving from"
-                        //console.log("old and new room IDs", GAME_TILES[this.location].room, GAME_TILES[this.location][direction]);
+                        //the last part of the previous line's IF statement means "the id of the room of the tile to the north/south/east/west of the tile that the player character is moving from"
                         newRoomEntry(this, GAME_TILES[GAME_TILES[this.location][direction]].room);
                     }
                 }
-                //console.log("in move function switch direction.  This.location is currently ", this.location);
                 switch (direction) { // after checking for special events, place character in new tile
                     case ("up"):
                         this.setLocation(GAME_TILES[this.location].up);
@@ -127,16 +123,12 @@ document.addEventListener('DOMContentLoaded', function(){
                         this.setLocation(GAME_TILES[this.location].down);
                         break;
                     case ("left"):
-                        //console.log("in left move function", this.location, direction);
                         this.setLocation(GAME_TILES[this.location].left);
                         break;
                     default:
                         console.log("path is blocked");
                 }
-            } else {
-                //console.log("Cannot move that direction");
             }
-            //console.log("Character moved.  Current position: " + this.location);
         }
     }
     
