@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', function(){
     const CHARACTERS = [];
     const coworkerNames = [
         {name: "Robin", image: "./thisR.png"}, 
-        {name: "Sal", image: "./thisS.png"}, 
         {name: "Mel", image: "./thisM.png"}, 
         {name: "Sam", image: "./thisS.png"}, 
         {name: "Dana", image:"./thisD.png"}, 
@@ -93,9 +92,12 @@ document.addEventListener('DOMContentLoaded', function(){
                 }
                 if (GAME_TILES[GAME_TILES[this.location][direction]].contains){ // if there is something to the tile to the north of the tile that the player is in, resolve that encounter
                     console.log("calling resolveEncounter", this, direction);
-                    direction = resolveEncounter(this, direction);
+                    let encounterResult = resolveEncounter(this, direction);
+                    if (encounterResult === "cancel move"){
+                        return;
+                    }
                 }
-                if ((this.name === "player_character") && (direction)){  // TRY FUSING THIS WITH PREVIOUS IF STATEMENT WHEN REFACTORING
+                if (this.name === "player_character"){
                     if ((GAME_TILES[this.location].room != GAME_TILES[GAME_TILES[this.location][direction]].room)){  // if a player is entering a new room, trigger newRoomEntry event
                         //the last part of that horrible if statement means "the id of the room of the tile to the north/south/east/west of the tile that the player character is moving from"
                         //console.log("old and new room IDs", GAME_TILES[this.location].room, GAME_TILES[this.location][direction]);
@@ -187,30 +189,34 @@ document.addEventListener('DOMContentLoaded', function(){
                             gameActive = false; 
                             document.querySelector("input").style.background = "green";
                         }
-                        return direction;
                 }
             } else if (foundObject.type === "monster") {  // if player has thrown themselves at a monster, end the game in a loss.
-                logNewMessage(`${monster.name} caught you!  Better luck next time.`);
-                document.getElementById("log_player1").style.background = "red";
-                gameActive = false;
-                document.querySelector("input").style.background = "green";
+                loseGame(foundObject.name, movingCharacter, GAME_TILES[GAME_TILES[movingCharacter.location][direction]]._id);
+                return "cancel move";
             } else {
                 console.log("error in resolveEncounter - player encountered unknown object");
             }
-        } else if (movingCharacter.type === "monster"){ // **********FIX THIS*************
+        } else if (movingCharacter.type === "monster"){
             if (foundObject.type === "object" || foundObject.type === "monster"){
                 console.log("NPC-NPC collision");
+                return "cancel move";
             } else if (foundObject.type === "player"){  // if monster has caught a player, end game in a loss
-                logNewMessage(`${monster.name} caught you!  Better luck next time.`);
-                document.getElementById("log_player1").style.background = "red";
-                gameActive = false;
-                document.querySelector("input").style.background = "green";
+                console.log("Losting game at tile", GAME_TILES[GAME_TILES[movingCharacter.location][direction]]);
+                loseGame(movingCharacter.name, foundObject, GAME_TILES[GAME_TILES[movingCharacter.location][direction]]._id);
             } else {
                 console.log("error in resolveEncounter - monster encountered unknown object");
             }
         } else {
             console.log("error in resolveEncounter - unknown type of moving character");
         }
+    }
+
+    function loseGame(monsterName, player, tileId){
+        document.getElementById("square" + tileId).style.background = "red";
+        logNewMessage(`${monsterName} caught you!  Better luck next time.`);
+        //document.getElementById("log_player1").style.background = "red";
+        gameActive = false;
+        document.querySelector("input").style.background = "green";
     }
 
     function logNewMessage(thisMessage){
@@ -262,16 +268,13 @@ document.addEventListener('DOMContentLoaded', function(){
         return shortestPaths;
     }
 
-    function newRoomEntry(player, newRoomIndex){
+    function newRoomEntry(player, newRoomIndex){ // if player is entering a new room, reveal the room on the map, and activate any monsters inside
         console.log("newRoomIndex", newRoomIndex, `#room${newRoomIndex}`);
         console.log(document.getElementById(`room${newRoomIndex}`));
         document.getElementById(`room${newRoomIndex}`).style.visibility = "visible";
         for (thisTile of GAME_TILES){
-            //console.log('this tile', thisTile);
             if (thisTile.contains && (thisTile.contains.type === "monster")){
-                //console.log("tile.room and player.location", thisTile.room, GAME_TILES[player.location].room);
                 if (thisTile.room  === newRoomIndex){
-                    //console.log("Checking for monsters to activate.  This tile looks interesting", thisTile);
                     let activatedMonster = thisTile.contains;
                     logNewMessage(`${activatedMonster.name} is in the room!  They would like a word with you.`);
                     activatedMonster.focus = player;
@@ -282,6 +285,30 @@ document.addEventListener('DOMContentLoaded', function(){
 
     //generate game board: nested for loop:  for each room, go through tile by tile.  Give the tiles their suite of IDs
     function createBoard(){
+        let nextTileID = 0;
+        for (let i=0; i<roomCount; i++){ // i is also the id of the current room
+            let newRoom = document.createElement("div");
+            newRoom.classList.add("room");
+            newRoom.setAttribute("id", `room${i}`);
+            for (let j=0; j<(roomHeight * roomWidth); j++){ // j is also the squareID of the current tile
+                let thisTile = new Tile(i, j, nextTileID, roomHeight, roomWidth);
+                GAME_TILES.push(thisTile);
+                GAME_TILES_FOR_PATHS[thisTile._id] = [];
+                for (thisDirection of ["up", "right", "down", "left"]){// construct game tile format that feeds into shortest path algorithm: [{tile_id: [adjacent_tile_id, distance], [adjacent_tile_id, distance], etc}]
+                    if (thisTile[thisDirection] != null){
+                        GAME_TILES_FOR_PATHS[thisTile._id].push([thisTile[thisDirection], 1]);
+                    }
+                }
+                newRoom.appendChild(thisTile.element);
+                nextTileID++;
+            }
+            document.querySelector('.board').appendChild(newRoom);
+        }
+        createDoor(27, 62);
+        createDoor(58, 93);
+        createDoor(69, 95);
+        createDoor(118, 153);
+        createDoor(124, 150);
         function createDoor(tile1ID, tile2ID){
             // doorway orientation can be determined from the difference of the two tile positions
             // if it equals roomWidth-1: tile1 on left, tile2 on right
@@ -315,31 +342,6 @@ document.addEventListener('DOMContentLoaded', function(){
                 
             }
         }
-        let nextTileID = 0;
-        for (let i=0; i<roomCount; i++){ // i is also the id of the current room
-            let newRoom = document.createElement("div");
-            newRoom.classList.add("room");
-            newRoom.setAttribute("id", `room${i}`);
-            for (let j=0; j<(roomHeight * roomWidth); j++){ // j is also the squareID of the current tile
-                let thisTile = new Tile(i, j, nextTileID, roomHeight, roomWidth);
-                GAME_TILES.push(thisTile);
-                GAME_TILES_FOR_PATHS[thisTile._id] = [];
-                for (thisDirection of ["up", "right", "down", "left"]){// construct game tile format that feeds into shortest path algorithm
-                    //console.log("this direction, this tile", thisDirection, thisTile);
-                    if (thisTile[thisDirection] != null){
-                        GAME_TILES_FOR_PATHS[thisTile._id].push([thisTile[thisDirection], 1]);
-                    }
-                }
-                newRoom.appendChild(thisTile.element);
-                nextTileID++;
-            }
-            document.querySelector('.board').appendChild(newRoom);
-        }
-        createDoor(27, 62);
-        createDoor(58, 93);
-        createDoor(69, 95);
-        createDoor(118, 153);
-        createDoor(124, 150);
     }
 
     createBoard();
@@ -350,12 +352,12 @@ document.addEventListener('DOMContentLoaded', function(){
         let newMonsterInfo = coworkerNames.splice(Math.floor(Math.random()*coworkerNames.length), 1)[0];
         console.log("newMonsterInfo", newMonsterInfo);
         let newMonster = new Character(1, 10, 0, newMonsterInfo.name, "monster", newMonsterInfo.image);
-        newMonster.setLocation(Math.floor(Math.random()*GAME_TILES.length));
+        newMonster.setLocation(Math.floor(Math.random()*(GAME_TILES.length-1))+1);
     }
     playerCharacter.setLocation(0);
     newRoomEntry(playerCharacter, GAME_TILES[0].room);
-    key1.setLocation(Math.floor(Math.random()*GAME_TILES.length));
-    key2.setLocation(Math.floor(Math.random()*GAME_TILES.length));
+    key1.setLocation(Math.floor(Math.random()*(GAME_TILES.length-1))+1);
+    key2.setLocation(Math.floor(Math.random()*(GAME_TILES.length-1))+1);
     //console.log('key1', key1.location);
     //console.log('key2', key2.location);
     //console.log("Tile List", GAME_TILES);
