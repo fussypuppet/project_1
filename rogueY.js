@@ -13,7 +13,6 @@ document.addEventListener('DOMContentLoaded', function(){
         {name: "Dana", image:"./thisD.png"}, 
         {name: "Harley", image: "./thisH.png"}
     ];
-    const pronouns = ["He", "She", "They"];
     const possibleDirections = ["up", "right", "down", "left"];
 
     document.onkeydown = function(e){
@@ -124,7 +123,7 @@ document.addEventListener('DOMContentLoaded', function(){
     function takeMonsterTurn(player){
         for (monster of MONSTERS){
             if (monster.focus){
-                let lotsOfPaths = findPath2(monster.location, player.location);
+                let lotsOfPaths = findPath(monster.location, player.location);
                 //console.log("lotsOfPaths", lotsOfPaths);
                 monster.nextMoves = lotsOfPaths[player.location].slice(2); //the slice(2) at the end is an artifact of the paths algorithm - can remove it in later refactoring    
                 console.log("monster", monster);
@@ -199,22 +198,29 @@ document.addEventListener('DOMContentLoaded', function(){
         document.getElementById("log_player1").appendChild(newMessage);
     }
 
-    function findPath2(startPoint, endPoint){
+    function findPath(startPoint, endPoint){
+        // This function uses a simplified Dijkstra's Shortest Path algorithm to find a shortest path from the monster to the player character
+        // It can be simpler than normal because the distance between all adjacent cells is the same
+        // The algorithm works by first finding all cells that are adjacent to the starting point (distance = 1).  The path to them is obvious.
+        // The algorithm then registers those distance=1 cells onto a first-on-first-off queue for cells that are on the frontier of exploration.
+        // It then plucks those cells off the queue one by one (starting with ones that are the closest to the origin point), looking for unexplored cells adjacent to them.
+        // registering paths to them, and adding those to the end of the queue.
+        // So for instance, all unexplored cells adjacent to a distance=1 cell will be distance=2 cells, and the path to them will be via the distance=1 cell.
+        // Those distance=2 cells are then added to the frontier queue, and will be evaluated for their own neighbors after all the distance=1 cells have been looked at.
+        // The algorithm ends up finding not only a shortest path to the target cell, but also paths to every cell that is closer than the target,
+        // which sounds inefficient, but really isn't, since the algorithm ensures that the While loop will run at most a number of times equal to the number of cells.
+        // THIS VERSION COULD BE IMPROVED BY MODIFYING IT TO FIND A RANDOM SHORTEST PATH.  Right now the path monsters will take while pursuing players is predictable.
+        // IT ALSO RETURNS PATH ARRAYS WHERE THE FIRST TWO ENTRIES ARE ALWAYS THE ORIGIN CELL.  Interesting entries only start at index [2].
         console.log(`Finding path from ${startPoint} to ${endPoint}`);
         let shortestPaths = {};
         let pathFound = false;
         shortestPaths[startPoint] = [startPoint];
         let edgeVertexList = []; //list of cells on the edge of exploration;
-        edgeVertexList[0] = startPoint;
-        
+        edgeVertexList[0] = startPoint;  
         while (pathFound === false){
-            //console.log("edgeVertexList", edgeVertexList);
-            //console.log("shortestPaths", shortestPaths);
-            currentFocus = GAME_TILES[edgeVertexList.shift()];  // when all adjacent cells have been evaluated, move to the next cell on the queue.  I'm trusting the inherent organization of the map to ensure that this evaluates a next-closest cell every time.
-            //console.log("currentFocus", currentFocus);
+            currentFocus = GAME_TILES[edgeVertexList.shift()];  // when all adjacent cells have been evaluated, move to the next cell on the queue.
             for (direction of possibleDirections){          //look at all cells adjacent to this one
                 if (currentFocus[direction] && !shortestPaths[currentFocus[direction]]){      // if the adjacent cell exists & does not currently have a path registered
-                    //console.log("currentFocus, direction does not have a path registered", currentFocus)
                     shortestPaths[currentFocus[direction]] = shortestPaths[currentFocus._id].concat(currentFocus._id); // register the shortest path to it
                     if (currentFocus[direction] === endPoint){ // if we just registered a path to the target point, break out of both loops and return result
                         pathFound = true;
