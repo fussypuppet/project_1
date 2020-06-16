@@ -21,3 +21,4 @@ Known issues:
 - rarely, the player icon does not disappear when player loses
 - monsters follow predictable paths to the player, and can get stuck behind other monsters/objects
 - the words "monster" and "coworker" are used interchangeably throughout
+- rarely, objects spawn on top of each other, with strange results

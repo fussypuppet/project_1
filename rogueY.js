@@ -56,8 +56,9 @@ document.addEventListener('DOMContentLoaded', function(){
         this.element = newHTMLTile;
     }
 
-    function Character(name, type, image_location){
+    function Character(name, messageString, type, imageLocation){
         this.name = name;
+        this.messageString = messageString;
         this.type = type;
         this.inventory = []; //a list of all useful items the character has picked up
         this.location = null;
@@ -67,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function(){
         let icon = document.createElement("img");
         icon.classList.add(name);
         icon.setAttribute("alt", `${name} image`);
-        icon.setAttribute("src", image_location);
+        icon.setAttribute("src", imageLocation);
         this.image = icon;
         CHARACTERS.push(this);
         this.setLocation = function(location){ // Used in character moves and game initialization.  Make sure character is nowhere else, and place them in the indicated location
@@ -156,7 +157,7 @@ document.addEventListener('DOMContentLoaded', function(){
         let foundObject = GAME_TILES[GAME_TILES[movingCharacter.location][direction]].contains;
         if (movingCharacter.type === "player") {
             if (foundObject.type === "object") {  // if a player encounters an object, pick it up and check for win
-                logNewMessage("You have found " + foundObject.name);
+                logNewMessage("You have found " + foundObject.messageString);
                 switch (foundObject.name) {
                     case "key":
                         let gameOver = false;
@@ -342,14 +343,14 @@ document.addEventListener('DOMContentLoaded', function(){
 
     // create board and spawn player, monsters, and items
     createBoard();
-    const playerCharacter = new Character("player_character", "player", "./images/player.png");
-    const key1 = new Character("key", "object", "./images/key.png");
-    const key2 = new Character("key", "object", "./images/key.png");
-    const bicycle = new Character("bicycle", "object", "./images/bike.png");
-    const headphones = new Character("headphones", "object", "./images/note.png");
+    const playerCharacter = new Character("player_character", "", "player", "./images/player.png");
+    const key1 = new Character("key", "one of your keys!", "object", "./images/key.png");
+    const key2 = new Character("key", "one of your keys!", "object", "./images/key.png");
+    const bicycle = new Character("bicycle", "your bicycle", "object", "./images/bike.png");
+    const headphones = new Character("headphones", "your headphones", "object", "./images/note.png");
     for (let i=0; i<3; i++){
         let newMonsterInfo = coworkerNames.splice(Math.floor(Math.random()*coworkerNames.length), 1)[0];
-        let newMonster = new Character(newMonsterInfo.name, "monster", newMonsterInfo.image);
+        let newMonster = new Character(newMonsterInfo.name, "", "monster", newMonsterInfo.image);
         newMonster.setLocation(Math.floor(Math.random()*(GAME_TILES.length-1))+1);
     }
     playerCharacter.setLocation(0);
