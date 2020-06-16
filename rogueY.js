@@ -7,11 +7,11 @@ document.addEventListener('DOMContentLoaded', function(){
     const GAME_TILES_FOR_PATHS = {};
     const CHARACTERS = [];
     const coworkerNames = [
-        {name: "Robin", image: "./thisR.png"}, 
-        {name: "Mel", image: "./thisM.png"}, 
-        {name: "Sam", image: "./thisS.png"}, 
-        {name: "Dana", image:"./thisD.png"}, 
-        {name: "Harley", image: "./thisH.png"}
+        {name: "Robin", image: "./images/thisR.png"}, 
+        {name: "Mel", image: "./images/thisM.png"}, 
+        {name: "Sam", image: "./images/thisS.png"}, 
+        {name: "Dana", image:"./images/thisD.png"}, 
+        {name: "Harley", image: "./images/thisH.png"}
     ];
     const possibleDirections = ["up", "right", "down", "left"];
     let gameActive = true;
@@ -176,7 +176,7 @@ document.addEventListener('DOMContentLoaded', function(){
                         break;
                 }
             } else if (foundObject.type === "monster") {  // if player has thrown themselves at a monster, end the game in a loss.
-                loseGame(foundObject.name, movingCharacter, GAME_TILES[GAME_TILES[movingCharacter.location][direction]]._id);
+                loseGame(foundObject, movingCharacter, GAME_TILES[GAME_TILES[movingCharacter.location][direction]]._id);
                 return "cancel move";
             } else {
                 console.log("error in resolveEncounter - player encountered unknown object");
@@ -193,7 +193,7 @@ document.addEventListener('DOMContentLoaded', function(){
                 }
                 if (!hasHeadphones){
                     console.log("Lost game at tile", GAME_TILES[GAME_TILES[movingCharacter.location][direction]]);
-                    loseGame(movingCharacter.name, foundObject, GAME_TILES[GAME_TILES[movingCharacter.location][direction]]._id);
+                    loseGame(movingCharacter, foundObject, GAME_TILES[GAME_TILES[movingCharacter.location][direction]]._id);
                 } else {
                     logNewMessage("You successfully pretend that you can't hear your coworker!");
                     return "cancel move";
@@ -209,9 +209,11 @@ document.addEventListener('DOMContentLoaded', function(){
         }
     }
 
-    function loseGame(monsterName, player, tileId){
+    function loseGame(monster, player, tileId){
         document.getElementById("square" + tileId).style.background = "red";
-        logNewMessage(`${monsterName} caught you!  Better luck next time.`);
+        logNewMessage(`${monster.name} caught you!  Better luck next time.`);
+        document.querySelector(`.${monster.name}`).src = `./images/this${monster.name[0]}red.png`;
+        player.setLocation("null");
         gameActive = false;
         document.querySelector("input").style.background = "green";
     }
@@ -334,11 +336,11 @@ document.addEventListener('DOMContentLoaded', function(){
 
     // create board and spawn player, monsters, and items
     createBoard();
-    const playerCharacter = new Character("player_character", "player", "./player.png");
-    const key1 = new Character("key", "object", "./key.png");
-    const key2 = new Character("key", "object", "./key.png");
-    const bicycle = new Character("bicycle", "object", "./bike.png");
-    const headphones = new Character("headphones", "object", "./note.png");
+    const playerCharacter = new Character("player_character", "player", "./images/player.png");
+    const key1 = new Character("key", "object", "./images/key.png");
+    const key2 = new Character("key", "object", "./images/key.png");
+    const bicycle = new Character("bicycle", "object", "./images/bike.png");
+    const headphones = new Character("headphones", "object", "./images/note.png");
     for (let i=0; i<3; i++){
         let newMonsterInfo = coworkerNames.splice(Math.floor(Math.random()*coworkerNames.length), 1)[0];
         let newMonster = new Character(newMonsterInfo.name, "monster", newMonsterInfo.image);
