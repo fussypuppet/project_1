@@ -1,4 +1,4 @@
-.info {
+main {
     display: grid;
     width: 410px;
     grid-template-columns: 460px 280px;
@@ -82,6 +82,10 @@ li > img {
     height: 20px;
 }
 
+.legend {
+    border: 1px solid black;
+}
+
 .legend > ul {
     list-style-type: none;
     padding: 0 10px 0 10px;
@@ -95,6 +99,18 @@ h1 {
     text-align: center;
 }
 
-input {
+button {
     font-size: 1.1rem;
+    display: block;
+    margin: 0 auto;
+    margin-bottom: 20px;
+}
+
+#door_example {
+    display: inline-block;
+    height: 25px;
+    width: 17px;
+    border: 1px dotted black;
+    border-bottom: 4px solid #C19A6B;
+    margin-right: 10px;
 }

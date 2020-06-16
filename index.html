@@ -8,10 +8,12 @@
     <title>Oh no!</title>
 </head>
 <body>
-    <h1>Oh No!</h1>
-    <h3 id="subtitle">All done at the office!  Time to go home.  Find both your keys while avoiding co-workers to win</h3>
-    <form><input type="submit" value="Start new game"></form>
-    <div class="info">
+    <header>
+        <h1>Oh No!</h1>
+        <h3 id="subtitle">All done at the office!  Time to go home.  Find both your keys while avoiding co-workers to win</h3>
+        <button id="restart">Start new game</button>
+    </header>
+    <main>
         <div class="legend">
             <h3>Legend</h3>
             <ul>
@@ -27,6 +29,7 @@
                     <img src='./images/thisR.png' alt='a coworker icon'>
                     <img src='./images/thisS.png' alt='a coworker icon'>: Your co-workers.  Run away!
                 </li>
+                <li><div id="door_example"></div>: Brown bars along walls indicate doorways to other rooms</li>
             </ul>
         </div>
         <div class="board">
@@ -39,5 +42,5 @@
             <h3>Message Log</h3>
             <ul id="log_player1"></ul>
         </div>
-    </div>
+    </main>
 </html>

@@ -2,7 +2,7 @@ Oh No!
 
 It's the end of the workday, and time to go home.  Explore the map and grab both of your lost keys while avoiding your coworkers to win!
 
-This game was inspired by games I played as a kid, especially Rogue, back when games were mostly limited to ASCII characters to supply their graphics.
+This game was inspired by games I played as a kid, especially Rogue, back when games were mostly limited to ASCII characters to supply their graphics.  It runs entirely on html, css, and Javascript.
 
 
 Instructions:

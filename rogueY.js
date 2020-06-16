@@ -14,10 +14,11 @@ document.addEventListener('DOMContentLoaded', function(){
         {name: "Harley", image: "./images/thisH.png"}
     ];
     const possibleDirections = ["up", "right", "down", "left"];
+    const restartButton = document.getElementById("restart");
     let gameActive = true;
 
 
-    //event listener for arrow key keypresses.  Game reset button works via default form submission refresh
+    //event listeners for arrow key keypresses & reload button
     document.onkeydown = function(e){
         if (gameActive){
             //console.log("keypress logged.  event:", e);
@@ -36,6 +37,7 @@ document.addEventListener('DOMContentLoaded', function(){
             }
         }
     }
+    restartButton.addEventListener("click", function(){location.reload();});
 
 
     // object constructors
@@ -119,6 +121,8 @@ document.addEventListener('DOMContentLoaded', function(){
         }
     }
     
+
+    // game functions
     function takeMonsterTurn(player){
         for (monster of CHARACTERS){
             if (monster.focus){ // only monster-type characters ever have a focus value
@@ -166,7 +170,7 @@ document.addEventListener('DOMContentLoaded', function(){
                             logNewMessage("Congratulations! You won!");
                             document.getElementById("subtitle").innerText = "Congratulations!  You won!";
                             gameActive = false; 
-                            document.querySelector("input").style.background = "green";
+                            document.querySelector("button").style.background = "green";
                         }
                         break;
                     case "bicycle":
@@ -217,7 +221,7 @@ document.addEventListener('DOMContentLoaded', function(){
         player.setLocation("null");
         gameActive = false;
         document.getElementById("subtitle").innerText = `${monster.name} caught you!  Better luck next time.`;
-        document.querySelector("input").style.background = "green";
+        document.querySelector("button").style.background = "green";
     }
 
     function logNewMessage(thisMessage){
@@ -310,26 +314,26 @@ document.addEventListener('DOMContentLoaded', function(){
                 case (roomWidth-1):
                     GAME_TILES[tile1ID].right = tile2ID;
                     GAME_TILES[tile2ID].left = tile1ID;
-                    GAME_TILES[tile1ID].element.style.borderRight = "3px solid #C19A6B";
-                    GAME_TILES[tile2ID].element.style.borderLeft = "3px solid #C19A6B";
+                    GAME_TILES[tile1ID].element.style.borderRight = "4px solid #C19A6B";
+                    GAME_TILES[tile2ID].element.style.borderLeft = "4px solid #C19A6B";
                     break;
                 case -(roomWidth-1):
                     GAME_TILES[tile2ID].right = tile1ID;
                     GAME_TILES[tile1ID].left = tile2ID;
-                    GAME_TILES[tile2ID].element.style.borderRight = "3px solid #C19A6B";
-                    GAME_TILES[tile1ID].element.style.borderLeft = "3px solid #C19A6B";
+                    GAME_TILES[tile2ID].element.style.borderRight = "4px solid #C19A6B";
+                    GAME_TILES[tile1ID].element.style.borderLeft = "4px solid #C19A6B";
                     break;
                 case (roomHeight * roomWidth - roomWidth):
                     GAME_TILES[tile1ID].down = tile2ID;
                     GAME_TILES[tile2ID].up = tile1ID;
-                    GAME_TILES[tile1ID].element.style.borderBottom = "3px solid #C19A6B";
-                    GAME_TILES[tile2ID].element.style.borderTop = "3px solid #C19A6B";
+                    GAME_TILES[tile1ID].element.style.borderBottom = "4px solid #C19A6B";
+                    GAME_TILES[tile2ID].element.style.borderTop = "4px solid #C19A6B";
                     break;
                 case -(roomHeight * roomWidth - roomWidth):
                     GAME_TILES[tile2ID].right = tile2ID;
                     GAME_TILES[tile1ID].left = tile1ID;
-                    GAME_TILES[tile2ID].element.style.borderBottom = "3px solid #C19A6B";
-                    GAME_TILES[tile1ID].element.style.borderTop = "3px solid #C19A6B";
+                    GAME_TILES[tile2ID].element.style.borderBottom = "4px solid #C19A6B";
+                    GAME_TILES[tile1ID].element.style.borderTop = "4px solid #C19A6B";
                 
             }
         }
