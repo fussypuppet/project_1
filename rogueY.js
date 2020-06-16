@@ -112,7 +112,9 @@ document.addEventListener('DOMContentLoaded', function(){
                         newRoomEntry(this, GAME_TILES[GAME_TILES[this.location][direction]].room);
                     }
                 }
-                this.setLocation(GAME_TILES[this.location][direction]); // move character the correct direction from its current tile.
+                if ((gameActive === true) || (this.type === "monster")){
+                    this.setLocation(GAME_TILES[this.location][direction]); // if the game hasn't ended, move character the correct direction from its current tile.
+                }
             }
         }
     }
@@ -162,8 +164,7 @@ document.addEventListener('DOMContentLoaded', function(){
                         addToInventory(foundObject);
                         if (gameOver === true){
                             logNewMessage("Congratulations! You won!");
-                            let cheer = new Audio("./1_person_cheering-Jett_Rifkin-1851518140.mp3")
-                            cheer.play();
+                            document.getElementById("subtitle").innerText = "Congratulations!  You won!";
                             gameActive = false; 
                             document.querySelector("input").style.background = "green";
                         }
@@ -215,6 +216,7 @@ document.addEventListener('DOMContentLoaded', function(){
         document.querySelector(`.${monster.name}`).src = `./images/this${monster.name[0]}red.png`;
         player.setLocation("null");
         gameActive = false;
+        document.getElementById("subtitle").innerText = `${monster.name} caught you!  Better luck next time.`;
         document.querySelector("input").style.background = "green";
     }
 
