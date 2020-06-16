@@ -1,23 +1,23 @@
-Pondering games that would be simple enough for me to make has gotten me thinking about the DOS-based games I played as a kid in the early 80's.  Two of them, Rogue and Zyll, stand out as games that would be challenging but possible to recreate.  I'd like to create a game that draws inspiration from both of them.
-Rogue was an ASCII-based dungeon crawler.  (see screenshot).  Players were represented by a smiley-face extended-ASCII character, and would explore a procedurally generated multi-level dungeon, picking up items and battling monsters (each represented by single letters) as they went.
-![Slide 1](./images/rogue.jpg)
-Zyll was a real-time text-based two-player adventure game.  Each player would use half the keyboard and half the monitor (no peeking allowed!), and would explore the world trying to win before the other player did.
-![Slide 2](./images/zyll.jpg)
+Oh No!
 
-I'd like to create a Rogue-style dungeon crawler, but real-time for two players with a Zyll-style split screen.  Players will start at different points in the dungeon (though for ease of map generation, I'm imagining more a blocky office building that has suffered some sort of calamity).  They'll explore the office building, looking for two keys that unlock the exit.  Both keys are necessary to win.  Along the way, they'll upgrade themselves with items they stumble across (things like flashlights and bike helmets), fight computer opponents, and possibly fight each other.  
+It's the end of the workday, and time to go home.  Explore the map and grab both of your lost keys while avoiding your coworkers to win!
 
-![Slide 3](./images/project_1_wireframe.jpg)
+This game was inspired by games I played as a kid, especially Rogue, back when games were mostly limited to ASCII characters to supply their graphics.
 
-For my MVP, I' envisioning:
--a single-level map, consisting of 4-6 rooms made of nested grid elements. The map would be represented on the back end as an undirected graph.  The portion of the map explored by each player is displayed on their side of the screen.
--a few different monsters, and a few different powerups
--s pane for each player listing their game controls
--a pane for each player displaying their inventory and vital stats
 
-extras:
-- make map multi-level
-- make map randomly generated
-- make character classes
-- more items and monsters
-- more styling
-- AI for one of the players?
+Instructions:
+Navigate the map using arrow keys.
+Brown lines along the edges of rooms indicate doorways to other rooms.
+Collect items and keys by moving on top of them.
+If at any point you and a coworker occupy the same tile, you lose.
+Monsters (i.e. your coworkers) take one move for every move you make, and make their move immediately before your move resolves.
+Adding a bicycle to your inventory lets you take two moves for every one of your opponents'.
+Adding headphones to your inventory makes you immune to coworkers in cases where they attack a tile that you are currently leaving.  But you still lose in cases where you move directly into an enemy, or move into a game tile at the same time an enemy moves into it.
+
+Known issues:
+- old messages don't scroll out of sight
+- monsters can start behind doors, leading to surprise deaths
+- rarely, coworkers trample & delete other coworkers
+- rarely, the player icon does not disappear when player loses
+- monsters follow predictable paths to the player, and can get stuck behind other monsters/objects
+- the words "monster" and "coworker" are used interchangeably throughout
