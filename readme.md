@@ -10,15 +10,15 @@ Navigate the map using arrow keys.
 Brown lines along the edges of rooms indicate doorways to other rooms.
 Collect items and keys by moving on top of them.
 If at any point you and a coworker occupy the same tile, you lose.
-Monsters (i.e. your coworkers) take one move for every move you make, and make their move immediately before your move resolves.
+Coworkers take one move for every move you make, and make their move immediately before your move resolves.
 Adding a bicycle to your inventory lets you take two moves for every one of your opponents'.
 Adding headphones to your inventory makes you immune to coworkers in cases where they attack a tile that you are currently leaving.  But you still lose in cases where you move directly into an enemy, or move into a game tile at the same time an enemy moves into it.
 
 Known issues:
 - old messages don't scroll out of sight
-- monsters can start behind doors, leading to surprise deaths
+- coworkers can start behind doors, leading to surprise deaths
 - rarely, coworkers trample & delete other coworkers
 - rarely, the player icon does not disappear when player loses
-- monsters follow predictable paths to the player, and can get stuck behind other monsters/objects
-- the words "monster" and "coworker" are used interchangeably throughout
+- coworkers follow predictable paths to the player, and can get stuck behind other coworkers & objects
+- the words "monster" and "coworker" are used interchangeably throughout the code
 - rarely, objects spawn on top of each other, with strange results

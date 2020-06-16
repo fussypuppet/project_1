@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function(){
     const roomCount = 6;
     const GAME_TILES = [];
     const GAME_TILES_FOR_PATHS = {};
-    const CHARACTERS = [];
+    const CHARACTERS = [];  // list of all characters.  Note that everything that occupies a tile location (such as objects) also uses the Character javascript class.
     const coworkerNames = [
         {name: "Robin", image: "./images/thisR.png"}, 
         {name: "Mel", image: "./images/thisM.png"}, 
@@ -351,12 +351,14 @@ document.addEventListener('DOMContentLoaded', function(){
     for (let i=0; i<3; i++){
         let newMonsterInfo = coworkerNames.splice(Math.floor(Math.random()*coworkerNames.length), 1)[0];
         let newMonster = new Character(newMonsterInfo.name, "", "monster", newMonsterInfo.image);
-        newMonster.setLocation(Math.floor(Math.random()*(GAME_TILES.length-1))+1);
     }
-    playerCharacter.setLocation(0);
-    newRoomEntry(playerCharacter, GAME_TILES[0].room);
-    key1.setLocation(Math.floor(Math.random()*(GAME_TILES.length-1))+1);
-    key2.setLocation(Math.floor(Math.random()*(GAME_TILES.length-1))+1);
-    bicycle.setLocation(Math.floor(Math.random()*(GAME_TILES.length-1))+1);
-    headphones.setLocation(Math.floor(Math.random()*(GAME_TILES.length-1))+1);
+    // the code never uses many of the preceding character variable names, since the constructor function adds the objects to the more-convenient CHARACTERS list.  Refactor later.
+    for (thisCharacter of CHARACTERS){ // place all new characters & objects on game board at appropriate locations
+        let spawnLocation = Math.floor(Math.random()*(GAME_TILES.length-1))+1;
+        while(GAME_TILES[spawnLocation.contains]){ // if the random spawn location is already occupied, roll another location
+            spawnLocation = Math.floor(Math.random()*(GAME_TILES.length-1))+1;
+        }
+        thisCharacter.setLocation(spawnLocation);
+    }
+    newRoomEntry(playerCharacter, GAME_TILES[playerCharacter.location].room);
 })
