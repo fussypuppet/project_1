@@ -19,6 +19,5 @@ Known issues:
 - coworkers can start behind doors, leading to surprise deaths
 - rarely, coworkers trample & delete other coworkers
 - rarely, the player icon does not disappear when player loses
-- coworkers follow predictable paths to the player, and can get stuck behind other coworkers & objects
 - the words "monster" and "coworker" are used interchangeably throughout the code
-- rarely, objects spawn on top of each other, with strange results
+- coworkers follow predictable paths to the player, and can get stuck behind other objects.  This behavior could be more feature than bug though, since it adds an element of strategy.
